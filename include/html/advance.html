@@ -1,0 +1,450 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>ADVANCE SETTING</title>
+
+    <style>
+        body {
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+        }
+
+        .body_container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #EAEAEA;
+        }
+
+        label {
+            font-weight: bold;
+            color: black;
+        }
+
+        .danger {
+            color: #D71313;
+        }
+
+        .danger_value {
+            color: #D71313;
+            font-weight: bold;
+        }
+
+        .safe {
+            color: #1D5D9B;
+        }
+
+        .safe_value {
+            color: #1D5D9B;
+            font-weight: bold;
+        }
+
+        .current_value {
+            color: #00ABB3;
+            font-size: 18px;
+        }
+
+        .input_text {
+            box-sizing: border-box;
+            resize: vertical;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .select-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .select-box {
+            flex: 1;
+            width: 100%;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Style options within the <select> elements */
+        select option {
+            font-weight: normal;
+            color: #333;
+            background-color: #fff;
+        }
+
+        /* Style selected option */
+        select option:checked {
+            font-weight: bold;
+            color: #00ABB3;
+            background-color: #f1f1f1;
+        }
+
+        /* Minimalist button styles */
+        .button-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .button-mode {
+            flex: 1;
+            background-color: white;
+            color: black;
+
+            border: solid #EAEAEA 1px;
+            padding: 14px 0;
+            /* margin: 0px; */
+            border-radius: 5px;
+
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-mode:hover {
+            background-color: #EAEAEA;
+        }
+
+        .box-2-left {
+            margin-right: 5px;
+        }
+
+        .box-2-right {
+            margin-left: 5px;
+        }
+
+        .box-3-left {
+            margin-right: 5px;
+        }
+
+        .box-3-center {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        .box-3-right {
+            margin-left: 5px;
+        }
+
+        .button {
+            width: 100%;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+
+            font-size: medium;
+        }
+
+        .button-green {
+            background-color: #00ABB3;
+            color: #fff;
+        }
+
+        .button-gray {
+            background-color: #3C4048;
+            color: #fff;
+        }
+
+        .info_container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 320px) {
+
+            .button-container,
+            .select-container {
+                flex-direction: column;
+            }
+
+            .box-2-left {
+                margin-right: 0;
+            }
+
+            .box-2-right {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .box-3-left {
+                margin-right: 0px;
+            }
+
+            .box-3-center {
+                margin-left: 0px;
+                margin-right: 0px;
+                margin-top: 10px;
+            }
+
+            .box-3-right {
+                margin-left: 0px;
+                margin-top: 10px;
+            }
+        }
+    </style>
+
+    <script>
+        var min_voltage = -1;
+        var max_voltage = -1;
+        var min_current = -1;
+        var max_current = -1;
+        var min_activePower = -1;
+        var max_activePower = -1;
+        var min_powerFactor = -1;
+        var max_powerFactor = -1;
+
+        function getThreshold() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = this.responseText.split(",");
+
+                    min_voltage = parseFloat(response[0]);
+                    max_voltage = parseFloat(response[1]);
+                    min_current = parseFloat(response[2]);
+                    max_current = parseFloat(response[3]);
+                    min_activePower = parseFloat(response[4]);
+                    max_activePower = parseFloat(response[5]);
+                    min_powerFactor = parseFloat(response[6]);
+                    max_powerFactor = parseFloat(response[7]);
+
+                    // Update HTML elements
+                    document.getElementsByName("min_voltage")[0].innerHTML = min_voltage;
+                    document.getElementsByName("max_voltage")[0].innerHTML = max_voltage;
+                    document.getElementsByName("min_current")[0].innerHTML = min_current;
+                    document.getElementsByName("max_current")[0].innerHTML = max_current;
+                    document.getElementsByName("min_activePower")[0].innerHTML = min_activePower;
+                    document.getElementsByName("max_activePower")[0].innerHTML = max_activePower;
+                    document.getElementsByName("min_powerFactor")[0].innerHTML = min_powerFactor;
+                    document.getElementsByName("max_powerFactor")[0].innerHTML = max_powerFactor;
+                } else {
+                    // Handle error or other status codes
+                }
+            };
+            xhttp.open("GET", "/Threshold", true);
+            xhttp.send();
+        }
+
+        function postThreshold() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/updateThreshold", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+            // Prepare the data to send
+            var data = "min_voltage=" + encodeURIComponent(min_voltage) +
+                "&max_voltage=" + encodeURIComponent(max_voltage) +
+                "&min_current=" + encodeURIComponent(min_current) +
+                "&max_current=" + encodeURIComponent(max_current) +
+                "&min_activePower=" + encodeURIComponent(min_activePower) +
+                "&max_activePower=" + encodeURIComponent(max_activePower) +
+                "&min_powerFactor=" + encodeURIComponent(min_powerFactor) +
+                "&max_powerFactor=" + encodeURIComponent(max_powerFactor);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var response = xhr.responseText;
+                        console.log(response); // Handle the response here if needed
+                    } else {
+                        console.error("Error: " + xhr.status + " - " + xhr.statusText);
+                    }
+                }
+            };
+
+            xhr.send(data);
+        }
+
+        function update() {
+            // Get the values from input fields
+            min_voltage = parseFloat(document.getElementById("min_voltage").value);
+            max_voltage = parseFloat(document.getElementById("max_voltage").value);
+            min_current = parseFloat(document.getElementById("min_current").value);
+            max_current = parseFloat(document.getElementById("max_current").value);
+            min_activePower = parseFloat(document.getElementById("min_activePower").value);
+            max_activePower = parseFloat(document.getElementById("max_activePower").value);
+            min_powerFactor = parseFloat(document.getElementById("min_powerFactor").value);
+            max_powerFactor = parseFloat(document.getElementById("max_powerFactor").value);
+
+            // Check if the values are valid floats or NULL
+            var errorMessage = "";
+
+            if (isNaN(min_voltage) && document.getElementById("min_voltage").value !== "") {
+                errorMessage += "Invalid input for Minimum Voltage\n";
+            }
+            if (isNaN(max_voltage) && document.getElementById("max_voltage").value !== "") {
+                errorMessage += "Invalid input for Maximum Voltage\n";
+            }
+            if (isNaN(min_current) && document.getElementById("min_current").value !== "") {
+                errorMessage += "Invalid input for Minimum Current\n";
+            }
+            if (isNaN(max_current) && document.getElementById("max_current").value !== "") {
+                errorMessage += "Invalid input for Maximum Current\n";
+            }
+            if (isNaN(min_activePower) && document.getElementById("min_activePower").value !== "") {
+                errorMessage += "Invalid input for Minimum Active Power\n";
+            }
+            if (isNaN(max_activePower) && document.getElementById("max_activePower").value !== "") {
+                errorMessage += "Invalid input for Maximum Active Power\n";
+            }
+            if (isNaN(min_powerFactor) && document.getElementById("min_powerFactor").value !== "") {
+                errorMessage += "Invalid input for Minimum Power Factor\n";
+            }
+            if (isNaN(max_powerFactor) && document.getElementById("max_powerFactor").value !== "") {
+                errorMessage += "Invalid input for Maximum Power Factor\n";
+            }
+
+            // Check if all values are not entered
+            if (
+                isNaN(min_voltage) && isNaN(max_voltage) &&
+                isNaN(min_current) && isNaN(max_current) &&
+                isNaN(min_activePower) && isNaN(max_activePower) &&
+                isNaN(min_powerFactor) && isNaN(max_powerFactor)
+            ) {
+                errorMessage += "Please enter something!";
+            }
+
+            if (errorMessage !== "") {
+                alert(errorMessage);
+                return;
+            }
+
+            postThreshold();
+
+            getThreshold(); // Refresh data after updating
+        }
+    </script>
+</head>
+
+<body>
+    <div class="body_container">
+        <h1>ADVANCE SETTING</h1>
+        <hr>
+
+        <div class="button-container">
+            <a class="button-mode box-3-left" href="http://192.168.4.1/monitor">MONITOR</a>
+            <a class="button-mode box-3-center" href="http://192.168.4.1">SETTING</a>
+            <a class="button-mode box-3-right" href="http://192.168.4.1/advance">ADVANCE</a>
+        </div>
+        <hr>
+
+        <form onsubmit="event.preventDefault(); update();">
+            <div class="select-container">
+                <div class="select-box box-2-left">
+                    <label for="min_voltage"><span class="safe">Minimum</span> Voltage:</label>
+                    <span name="min_voltage" class="safe_value">#NULL</span></label>
+                    <br>
+                    <input type="text" id="min_voltage" name="min_voltage" class="input_text">
+                    </select>
+                </div>
+
+                <div class="select-box box-2-right">
+                    <label for="max_voltage"><span class="danger">Maximum</span> Voltage:</label>
+                    <span name="max_voltage" class="danger_value">#NULL</span></label>
+                    <br>
+                    <input type="text" id="max_voltage" name="max_voltage" class="input_text">
+                </div>
+            </div>
+
+            <div class="select-container">
+                <div class="select-box box-2-left">
+                    <label for="min_current"><span class="safe">Minimum</span> Current:</label>
+                    <span name="min_current" class="safe_value">#NULL</span></label>
+                    <br>
+                    <input type="text" id="min_current" name="min_current" class="input_text">
+                </div>
+
+                <div class="select-box box-2-right">
+                    <label for="max_current"><span class="danger">Maximum</span> Current:</label>
+                    <span name="max_current" class="danger_value">#NULL</span></label>
+                    <br>
+                    <input type="text" id="max_current" name="max_current" class="input_text">
+                </div>
+            </div>
+
+            <div class="select-container">
+                <div class="select-box box-2-left">
+                    <label for="min_activePower"><span class="safe">Minimum</span> kW:</label>
+                    <span name="min_activePower" class="safe_value">#NULL</span></label>
+                    <br>
+                    <input type="text" id="min_activePower" name="min_activePower" class="input_text">
+                </div>
+
+                <div class="select-box box-2-right">
+                    <label for="max_activePower"><span class="danger">Maximum</span> kW:</label>
+                    <span name="max_activePower" class="danger_value">#NULL</span></label>
+                    <br>
+                    <input type="text" id="max_activePower" name="max_activePower" class="input_text">
+                </div>
+            </div>
+
+            <div class="select-container">
+                <div class="select-box box-2-left">
+                    <label for="min_powerFactor"><span class="safe">Minimum</span> Power Factor:</label>
+                    <span name="min_powerFactor" class="safe_value">#NULL</span></label>
+                    <br>
+                    <input type="text" id="min_powerFactor" name="min_powerFactor" class="input_text">
+                </div>
+
+                <div class="select-box box-2-right">
+                    <label for="max_powerFactor"><span class="danger">Maximum</span> Power Factor:</label>
+                    <span name="max_powerFactor" class="danger_value">#NULL</span></label>
+                    <br>
+                    <input type="text" id="max_powerFactor" name="max_powerFactor" class="input_text">
+                </div>
+            </div>
+
+            <button type="submit" class="button button-green">Update</button>
+        </form>
+
+
+        <hr>
+
+        <form action="/normal" method="post">
+            <button type="submit" class="button button-gray" onclick="backNormalMode()">Back to Normal Mode</button>
+        </form>
+    </div>
+
+    <script>
+        getThreshold();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+  <title>WIFI</title>
+  <style>
+    body { background-color:#f1f1f1; margin:0; padding:0; }
+    .body_container { max-width:500px; margin:auto; padding:20px; background:#fff; border-radius:4px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
+    h1 { margin-top:0; text-align:center; }
+    hr { border:none; border-top:1px solid #EAEAEA; }
+    label { font-weight:bold; color:black; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { text-align:left; padding:8px; }
+    tr:nth-child(even){ background:#f2f2f2; }
+    th { background:#00ABB3; color:#fff; }
+    #wifiListTable th, #wifiListTable td { text-align:left; padding:8px; }
+    #wifiListTable td:nth-child(1){ width:60%; } /* SSID */
+    #wifiListTable td:nth-child(2){ width:20%; } /* dBm  */
+    #wifiListTable td:nth-child(3){ width:20%; } /* Select */
+    .current_value { color:#00ABB3; }
+    .input_text { width:100%; padding:12px 20px; margin:8px 0; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
+    .button-container { display:flex; flex-direction:row; justify-content:space-between; width:100%; }
+    .button { width:100%; padding:10px 20px; margin:8px 0; border:none; border-radius:4px; cursor:pointer; font-weight:bold; text-transform:uppercase; font-size:medium; }
+    .button-mode { flex:1; background:#fff; color:#000; border:solid #EAEAEA .5px; padding:10px 0; border-radius:4px; text-align:center; text-decoration:none; font-weight:bold; text-transform:uppercase; cursor:pointer; transition:background-color .3s ease; }
+    .button-green { background:#00ABB3; color:#fff; }
+    .button-gray { background:#3C4048; color:#fff; }
+    .button-mode:hover { background:#EAEAEA; }
+    .box-2-left { margin-right:5px; }
+    .box-2-right { margin-left:5px; }
+    .info_container { display:flex; flex-direction:column; justify-content:space-between; }
+    .info_box { background:#EAEAEA; padding:20px; border-radius:4px; box-sizing:border-box; flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.1); }
+    .info_box strong { font-weight:bold; font-size:medium; margin-bottom:10px; }
+    .info_box .value { color:#333; font-size:x-large; }
+    .info_box::before { content:''; display:block; width:50px; height:5px; background:#00ABB3; margin-bottom:10px; border-radius:4px; }
+    #loadingMessage { display:block; text-align:center; }
+    .modal { display:none; align-items:center; justify-content:center; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,.4); }
+    .modal-content { background:#fefefe; padding:20px; border:1px solid #888; width:80%; box-shadow:0 4px 8px rgba(0,0,0,.1); transform:translate(-50%,-50%); position:relative; top:50%; left:50%; }
+    .close { color:#aaa; float:right; font-size:x-large; font-weight:bold; }
+    .close:hover, .close:focus { color:black; text-decoration:none; cursor:pointer; }
+    @media (max-width:320px){
+      .info_container,.button-container,.select-container{ flex-direction:column; }
+      .box-2-left{ margin-right:0; }
+      .box-2-right{ margin-left:0; margin-top:10px; }
+      .modal-content{ width:100%; }
+    }
+    @media screen and (min-width:600px){ .modal-content{ max-width:500px; } }
+  </style>
+
+  <script>
+    var newSSID = "";
+    var newPassword = "";
+
+    function getColorForSignalStrength(dBm){
+      if (dBm >= -50) return '#00C851';
+      if (dBm >= -60) return '#ffbb33';
+      if (dBm >= -70) return '#ff8800';
+      return '#CC0000';
+    }
+
+    function getData(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200){
+          var response = this.responseText.split(",");
+          document.getElementById("ssid_wifi").innerHTML = response[0];
+        }
+      };
+      xhttp.open("GET","/data",true);
+      xhttp.send();
+    }
+
+    function postWiFi(ssid,password){
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST","/updateWiFi",true);
+      xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      var data = "new_ssid="+encodeURIComponent(ssid)+"&new_password="+encodeURIComponent(password);
+      xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4){
+          if (xhr.status === 200){ alert("Update WiFi successfully!"); }
+          else { alert("Failed to update WiFi. Please try again."); }
+        }
+      };
+      xhr.send(data);
+    }
+
+    function updateWiFi(){
+      newPassword = document.getElementById("new_password").value;
+      if (newSSID === "" || newPassword === ""){ alert("SSID or Password is empty!"); return; }
+      postWiFi(newSSID,newPassword);
+      getData();
+      newSSID=""; newPassword="";
+    }
+
+    function updateWiFiManually(){
+      newSSID = document.getElementById("new_ssid_manual").value;
+      newPassword = document.getElementById("new_password_manual").value;
+      if (newSSID === "" || newPassword === ""){ alert("SSID or Password is empty!"); return; }
+      postWiFi(newSSID,newPassword);
+      getData();
+      newSSID=""; newPassword="";
+    }
+
+    function backNormalMode(){
+      alert("Back to normal mode successfully!");
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST","/normal",true);
+      xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xhr.onreadystatechange = function(){
+        if (xhr.readyState == 4){ window.location.href = "about:blank"; }
+      };
+      xhr.send();
+    }
+
+    // --------- Rendering & Polling ----------
+    function renderWifiList(networks){
+      // Sort by SSID (stable)
+      networks.sort(function(a,b){
+        var A = (a.ssid || "").toUpperCase();
+        var B = (b.ssid || "").toUpperCase();
+        return A < B ? -1 : A > B ? 1 : 0;
+      });
+
+      var table = document.getElementById("wifiListTable");
+      table.innerHTML = table.rows[0].outerHTML;
+
+      for (var i=0;i<networks.length;i++){
+        var row  = table.insertRow(-1);
+        var c1   = row.insertCell(0);
+        var c2   = row.insertCell(1);
+        var c3   = row.insertCell(2);
+        var ssid = networks[i].ssid || "";
+        var rssi = networks[i].rssi;
+
+        c1.textContent = ssid;
+        c2.textContent = rssi;
+        c2.style.color = getColorForSignalStrength(rssi);
+
+        // SAFE: no inline quotes issues
+        c3.innerHTML =
+          '<button class="button button-gray" ' +
+          'data-ssid="'+ encodeURIComponent(ssid) +'" ' +
+          'onclick="selectNetwork(decodeURIComponent(this.dataset.ssid))">Select</button>';
+      }
+    }
+
+    function pollScanWifi(maxTries, intervalMs){
+      return new Promise(function(resolve,reject){
+        var tries = 0;
+        function tick(){
+          var xhr = new XMLHttpRequest();
+          xhr.open("GET","/scan_wifi",true);
+          xhr.onreadystatechange = function(){
+            if (xhr.readyState !== 4) return;
+
+            if (xhr.status === 200){
+              try { resolve(JSON.parse(xhr.responseText)); }
+              catch(e){ reject(new Error("Invalid JSON")); }
+              return;
+            }
+            if (xhr.status === 202){
+              tries++;
+              if (tries >= maxTries) reject(new Error("Scan timeout"));
+              else setTimeout(tick, intervalMs);
+              return;
+            }
+            reject(new Error("HTTP "+xhr.status));
+          };
+          xhr.send();
+        }
+        tick();
+      });
+    }
+
+    function updateWiFiList(){
+      var msg = document.getElementById("loadingMessage");
+      msg.style.color = 'black';
+      msg.innerText = "Scanning WiFi...";
+      pollScanWifi(8, 1000)
+        .then(function(networks){
+          renderWifiList(networks);
+          msg.style.color = networks.length > 0 ? 'green' : 'orange';
+          msg.innerText   = networks.length > 0 ? "WiFi list updated." : "No networks found.";
+        })
+        .catch(function(err){
+          console.error("scan error:", err);
+          msg.style.color = 'red';
+          msg.innerText   = "WiFi List Update Failed. Please Try Again.";
+        });
+    }
+
+    function selectNetwork(ssid){
+      newSSID = ssid;
+      document.getElementById("modalSSID").innerText = ssid;
+      var modal = document.getElementById("wifiPasswordModal");
+      var span  = document.getElementsByClassName("close")[0];
+      modal.style.display = "block";
+      span.onclick = function(){ modal.style.display = "none"; };
+      window.onclick = function(e){ if (e.target == modal) modal.style.display = "none"; };
+    }
+  </script>
+</head>
+
+<body>
+  <div class="body_container">
+    <h1>WIFI</h1>
+    <hr>
+
+    <div class="button-container">
+      <a class="button-mode box-2-left" href="/">MONITOR</a>
+      <a class="button-mode box-2-right" href="/wifi">WIFI</a>
+    </div>
+    <hr>
+
+    <div class="info_container">
+      <div class="info_box">
+        <strong>WiFi SSID</strong>
+        <span id="ssid_wifi" class="value">#NULL</span>
+      </div>
+    </div>
+    <hr>
+
+    <table id="wifiListTable">
+      <tr>
+        <th>SSID</th>
+        <th>dBm</th>
+        <th>Select</th>
+      </tr>
+    </table>
+
+    <div id="wifiPasswordModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <label for="new_password">Enter Password for <span id="modalSSID" class="current_value"></span></label><br>
+        <input type="password" id="new_password" name="new_password" class="input_text" required maxlength="64">
+        <button type="button" class="button button-green" onclick="updateWiFi()">Update WiFi</button>
+      </div>
+    </div>
+
+    <button type="button" class="button button-green" onclick="updateWiFiList()">Scan WiFi</button>
+    <div id="loadingMessage">Press button to scan WiFi.</div>
+    <hr>
+
+    <form onsubmit="return false;">
+      <label for="new_ssid_manual">WiFi SSID:</label><br>
+      <input type="text" id="new_ssid_manual" name="new_ssid_manual" class="input_text" required maxlength="32"><br>
+      <label for="new_password_manual">WiFi Password:</label><br>
+      <input type="password" id="new_password_manual" name="new_password_manual" class="input_text" required maxlength="64">
+      <button type="button" class="button button-green" onclick="updateWiFiManually()">Update WiFi</button>
+    </form>
+    <hr>
+
+    <button type="button" class="button button-gray" onclick="backNormalMode()">Back to Normal Mode</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      getData();
+    });
+  </script>
+</body>
+</html>

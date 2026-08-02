@@ -1,0 +1,243 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>ADMIN</title>
+
+    <style>
+        body {
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+        }
+
+        .body_container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #EAEAEA;
+        }
+
+        label {
+            font-weight: bold;
+            color: black;
+        }
+
+        .current_value {
+            color: #00ABB3;
+            font-weight: bold;
+        }
+
+        .input_text {
+            box-sizing: border-box;
+            resize: vertical;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Minimalist button styles */
+        .button-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .button-mode {
+            flex: 1;
+            background-color: white;
+            color: black;
+
+            border: solid #EAEAEA 1px;
+            padding: 14px 0;
+            /* margin: 0px; */
+            border-radius: 5px;
+
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-mode:hover {
+            background-color: #EAEAEA;
+        }
+
+        .button {
+            width: 100%;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+
+            font-size: medium;
+        }
+
+        .button-green {
+            background-color: #00ABB3;
+            color: #fff;
+        }
+
+        .button-gray {
+            background-color: #3C4048;
+            color: #fff;
+        }
+
+        .info_container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 320px) {
+
+            .button-container,
+            .select-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <script>
+        var id = "NULL";
+        var station_code = "NULL";
+
+        function getAdmin() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = this.responseText.split(",");
+                    console.log(response);
+
+                    id = response[0];
+                    station_code = response[1];
+
+                    console.log(id);
+                    console.log(station_code);
+
+                    // Update HTML elements
+                    document.getElementById("id").innerHTML = id;
+                    document.getElementById("station_code").innerHTML = station_code;
+                } else {
+                    // Handle error or other status codes
+                }
+            };
+            xhttp.open("GET", "/getAdmin", true);
+            xhttp.send();
+        }
+
+        function postAdmin() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/updateAdmin", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+            // Prepare the data to send
+            var data = "id=" + encodeURIComponent(id) + "&station_code=" + encodeURIComponent(station_code);
+
+            console.log(data);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var response = xhr.responseText;
+                        console.log(response); // Handle the response here if needed
+                    } else {
+                        console.error("Error: " + xhr.status + " - " + xhr.statusText);
+                    }
+                }
+            };
+
+            xhr.send(data);
+        }
+
+        function update() {
+            // Get the values from input fields
+            id = document.getElementById("new_id").value;
+            station_code = document.getElementById("new_station_code").value;
+
+            // Check if the values are valid floats or NULL
+            var errorMessage = "";
+
+            if (!/^\d{10}$/.test(id) && id.trim() !== "") {
+                errorMessage += "ID must be a 10-digit number.";
+            }
+
+            if (station_code.trim() === "") {
+                station_code = "NULL"
+            }
+            if (id.trim() === "") {
+                id = "NULL";
+            }
+            if (id === "NULL" && station_code === "NULL") {
+                errorMessage += "Please enter something!"
+            }
+
+            if (errorMessage !== "") {
+                alert(errorMessage);
+                return;
+            }
+
+            postAdmin();
+
+            getAdmin(); // Refresh data after updating
+        }
+    </script>
+</head>
+
+<body>
+    <div class="body_container">
+        <h1>ADMIN</h1>
+        <hr>
+
+        <form onsubmit="event.preventDefault(); update();">
+            <label for="new_id">ID: <span id="id" name="id" class="current_value">#NULL</span></label> <br>
+            <input type="text" id="new_id" name="new_id" class="input_text" maxlength="10">
+            <br>
+
+            <label for="new_station_code">Station Code: <span id="station_code" name="station_code"
+                    class="current_value">#NULL</span></label> <br>
+            <input type="text" id="new_station_code" name="new_station_code" class="input_text" maxlength="16">
+            <br>
+
+            <button type="submit" class="button button-green">Update</button>
+        </form>
+
+
+        <hr>
+
+        <form action="/normal" method="post">
+            <button type="submit" class="button button-gray" onclick="backNormalMode()">Back to Normal Mode</button>
+        </form>
+    </div>
+
+    <script>
+        getAdmin();
+    </script>
+</body>
+
+</html>

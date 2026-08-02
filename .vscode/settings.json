@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+      "*.py": "python",
+      "array": "cpp",
+      "deque": "cpp",
+      "string": "cpp",
+      "unordered_map": "cpp",
+      "unordered_set": "cpp",
+      "vector": "cpp",
+      "string_view": "cpp",
+      "initializer_list": "cpp",
+      "httpclient.h": "c",
+      "arduino.h": "c",
+      "wifi.h": "c",
+      "arduino_json.h": "c",
+      "wifista.h": "c",
+      "regex": "cpp",
+      "system_error": "cpp",
+      "*.tcc": "cpp",
+      "cstddef": "cpp",
+      "sstream": "cpp",
+      "*.tpp": "cpp",
+      "functional": "cpp"
+    }
+}
